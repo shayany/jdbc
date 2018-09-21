@@ -1,6 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Main {
     static final String databaseURL = "jdbc:oracle:thin:@localhost:49161:xe";
@@ -20,10 +18,32 @@ public class Main {
 
         }
 
-        Connection connection = DriverManager.getConnection(databaseURL,username,password);
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try{
+            connection = DriverManager.getConnection(databaseURL,username,password);
+            System.out.println("Connection to the Oracle database established successfully");
 
-        System.out.println("Connection to the Oracle database established successfully");
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery("SELECT * FROM HR.countries");
+            String stringFormat = "%-20s%-20s\n";
+            while(resultSet.next()){
+                System.out.printf(stringFormat,resultSet.getString("COUNTRY_ID"),resultSet.getString("COUNTRY_NAME"));
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }finally {
+            if(resultSet!=null){
+                resultSet.close();
+            }
+            if (statement!=null){
+                statement.close();
+            }
+            if(connection!=null){
+                connection.close();
+            }
+        }
 
-        connection.close();
     }
 }
