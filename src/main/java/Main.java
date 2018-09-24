@@ -25,12 +25,19 @@ public class Main {
             connection = DriverManager.getConnection(databaseURL,username,password);
             System.out.println("Connection to the Oracle database established successfully");
 
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM HR.countries");
+            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            resultSet = statement.executeQuery("SELECT COUNTRY_ID,COUNTRY_NAME FROM HR.countries");
             String stringFormat = "%-20s%-20s\n";
             while(resultSet.next()){
                 System.out.printf(stringFormat,resultSet.getString("COUNTRY_ID"),resultSet.getString("COUNTRY_NAME"));
             }
+            resultSet.last();
+            System.out.println("Number of Rows: " + resultSet.getRow());
+
+            resultSet.absolute(1);
+            resultSet.updateString(2, "Argentina");
+            resultSet.updateRow();
+
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }finally {
